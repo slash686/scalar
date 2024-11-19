@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useWorkspace } from '@scalar/api-client/store'
 import { RequestAuth } from '@scalar/api-client/views/Request/RequestSection/RequestAuth'
 import type { Server, Spec } from '@scalar/types/legacy'
 import { computed } from 'vue'
@@ -18,12 +19,12 @@ const props = defineProps<{
   layout?: 'default' | 'accordion'
   baseServerURL?: string
   servers?: Server[]
-  proxy?: string
 }>()
 
 const { hideModels } = useSidebar()
+const { collections } = useWorkspace()
 
-console.log(props.proxy)
+const activeCollection = computed(() => Object.values(collections)[0])
 
 const introCardsSlot = computed(() =>
   props.layout === 'accordion' ? 'after' : 'aside',
@@ -61,6 +62,8 @@ const introCardsSlot = computed(() =>
             :servers="props.servers"
             :specification="parsedSpec" />
           <RequestAuth
+            v-if="activeCollection"
+            :collection="activeCollection"
             :selectedSecuritySchemeUids="[]"
             title="Authentication" />
           <ClientLibraries class="introduction-card-item" />

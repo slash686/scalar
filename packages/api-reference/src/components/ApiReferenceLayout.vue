@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { provideUseId } from '@headlessui/vue'
+import {
+  WORKSPACE_SYMBOL,
+  createWorkspaceStore,
+} from '@scalar/api-client/store'
 import { addScalarClassesToHeadless } from '@scalar/components'
 import { defaultStateFactory } from '@scalar/oas-utils/helpers'
 import {
@@ -25,7 +29,6 @@ import {
 
 import { ApiClientModal } from '../features/ApiClientModal'
 import {
-  AUTHENTICATION_SYMBOL,
   GLOBAL_SECURITY_SYMBOL,
   HIDE_DOWNLOAD_BUTTON_SYMBOL,
   HIDE_TEST_REQUEST_BUTTON_SYMBOL,
@@ -240,9 +243,17 @@ provideUseId(() => {
   return `${ATTR_KEY}-${instanceId}`
 })
 
+// Create the workspace store and provide it
+const workspaceStore = createWorkspaceStore({
+  isReadOnly: true,
+  proxyUrl: props.configuration.proxy,
+  themeId: props.configuration.theme,
+  useLocalStorage: false,
+})
+provide(WORKSPACE_SYMBOL, workspaceStore)
+
 // Provide global security
 provide(GLOBAL_SECURITY_SYMBOL, () => props.parsedSpec.security)
-provide(AUTHENTICATION_SYMBOL, () => props.configuration.authentication)
 provide(
   HIDE_DOWNLOAD_BUTTON_SYMBOL,
   () => props.configuration.hideDownloadButton,
@@ -337,7 +348,6 @@ const themeStyleTag = computed(
           :baseServerURL="configuration.baseServerURL"
           :layout="configuration.layout === 'classic' ? 'accordion' : 'default'"
           :parsedSpec="parsedSpec"
-          :proxy="configuration.proxy"
           :servers="configuration.servers">
           <template #start>
             <slot
