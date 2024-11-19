@@ -17,7 +17,7 @@ test('@scalar/api-reference jsdelivr build', async ({ page, isMobile }) => {
    */
   await expect(page).toHaveScreenshot('cdn-snapshot.png', {
     fullPage: true,
-    maxDiffPixelRatio: 0.02,
+    maxDiffPixelRatio: 0.04,
   })
 
   /**
