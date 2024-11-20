@@ -69,7 +69,9 @@ const introCardsSlot = computed(() =>
           <RequestAuth
             v-if="activeCollection"
             :collection="activeCollection"
-            :selectedSecuritySchemeUids="[]"
+            :selectedSecuritySchemeUids="
+              activeCollection.selectedSecuritySchemeUids
+            "
             title="Authentication" />
           <ClientLibraries class="introduction-card-item" />
         </div>
