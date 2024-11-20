@@ -11,35 +11,40 @@ import { ref, toRef, useAttrs, watch, type Ref, computed } from 'vue'
 import DataTableInputSelect from '../DataTable/DataTableInputSelect.vue'
 import { pillPlugin, backspaceCommand } from './codeVariableWidget'
 import EnvironmentVariableDropdown from '@/views/Environment/EnvironmentVariableDropdown.vue'
-import { useWorkspace } from '@/store'
 import { useClipboard } from '@scalar/use-hooks/useClipboard'
 import { ScalarIcon } from '@scalar/components'
 import { prettyPrintJson } from '@scalar/oas-utils/helpers'
-import { useActiveEntities } from '@/store/active-entities'
+import type { Router } from 'vue-router'
+import type { Environment } from '@scalar/oas-utils/entities/environment'
+import type { EnvVariables } from '@/libs/env-helpers'
 
 const props = withDefaults(
   defineProps<{
     colorPicker?: boolean
-    modelValue: string | number
-    error?: boolean
-    emitOnBlur?: boolean
-    lineNumbers?: boolean
-    lint?: boolean
-    disableTabIndent?: boolean
-    language?: CodeMirrorLanguage
-    handleFieldSubmit?: (e: string) => void
-    handleFieldChange?: (e: string) => void
-    placeholder?: string
-    required?: boolean
-    disableEnter?: boolean
+    default?: string | number
     disableCloseBrackets?: boolean
+    disableEnter?: boolean
+    disableTabIndent?: boolean
+    emitOnBlur?: boolean
     enum?: string[]
-    type?: string
-    nullable?: boolean
-    withVariables?: boolean
+    environment: Environment
+    envVariables: EnvVariables
+    error?: boolean
+    handleFieldChange?: (e: string) => void
+    handleFieldSubmit?: (e: string) => void
     importCurl?: boolean
     isCopyable?: boolean
-    default?: string | number
+    isReadOnly?: boolean
+    language?: CodeMirrorLanguage
+    lineNumbers?: boolean
+    lint?: boolean
+    modelValue: string | number
+    nullable?: boolean
+    placeholder?: string
+    required?: boolean
+    router?: Router
+    type?: string
+    withVariables?: boolean
   }>(),
   {
     disableCloseBrackets: false,
@@ -70,9 +75,6 @@ const dropdownPosition = ref({ left: 0, top: 0 })
 const dropdownRef = ref<InstanceType<
   typeof EnvironmentVariableDropdown
 > | null>(null)
-
-const { activeEnvVariables, activeEnvironment, router } = useActiveEntities()
-const { isReadOnly } = useWorkspace()
 
 const { copyToClipboard } = useClipboard()
 
@@ -124,9 +126,9 @@ const extensions: Extension[] = []
 if (props.colorPicker) extensions.push(colorPickerExtension)
 extensions.push(
   pillPlugin({
-    activeEnvironment,
-    activeEnvVariables,
-    isReadOnly,
+    environment: props.environment,
+    envVariables: props.envVariables,
+    isReadOnly: props.isReadOnly,
   }),
   backspaceCommand,
 )
@@ -265,11 +267,11 @@ export default {
   <EnvironmentVariableDropdown
     v-if="showDropdown && props.withVariables && !isReadOnly"
     ref="dropdownRef"
-    :activeEnvVariables="computed(() => activeEnvVariables)"
-    :activeEnvironment="computed(() => activeEnvironment)"
     :dropdownPosition="dropdownPosition"
+    :envVariables="props.envVariables"
+    :environment="props.environment"
     :query="dropdownQuery"
-    :router="router"
+    :router="props.router"
     @select="handleDropdownSelect" />
 </template>
 <style scoped>

@@ -9,18 +9,19 @@ import ViewLayoutContent from '@/components/ViewLayout/ViewLayoutContent.vue'
 import ViewLayoutSection from '@/components/ViewLayout/ViewLayoutSection.vue'
 import type { HotKeyEvent } from '@/libs'
 import { useWorkspace } from '@/store'
+import { useActiveEntities } from '@/store/active-entities'
 import { useModal } from '@scalar/components'
 import { environmentSchema } from '@scalar/oas-utils/entities/environment'
 import { nanoid } from 'nanoid'
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
 import EnvironmentColorModal from './EnvironmentColorModal.vue'
 import EnvironmentModal from './EnvironmentModal.vue'
 
-const router = useRouter()
 const route = useRoute()
 const { environments, environmentMutators, events } = useWorkspace()
+const { activeEnvironment, activeEnvVariables, router } = useActiveEntities()
 const colorModal = useModal()
 const environmentModal = useModal()
 
@@ -269,11 +270,14 @@ onBeforeUnmount(() => events.hotKeys.off(handleHotKey))
         <CodeInput
           v-if="activeEnvironmentID"
           class="pl-px pr-2 md:px-4 py-2"
+          :envVariables="activeEnvVariables"
+          :environment="activeEnvironment"
           isCopyable
           language="json"
           lineNumbers
           lint
           :modelValue="environments[activeEnvironmentID].value"
+          :router="router"
           @update:modelValue="handleEnvironmentUpdate" />
       </ViewLayoutSection>
     </ViewLayoutContent>

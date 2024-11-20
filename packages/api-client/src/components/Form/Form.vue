@@ -3,6 +3,7 @@ import DataTable from '@/components/DataTable/DataTable.vue'
 import DataTableInput from '@/components/DataTable/DataTableInput.vue'
 import DataTableRow from '@/components/DataTable/DataTableRow.vue'
 import ViewLayoutSection from '@/components/ViewLayout/ViewLayoutSection.vue'
+import { useActiveEntities } from '@/store/active-entities'
 
 defineProps<{
   title?: string
@@ -10,6 +11,8 @@ defineProps<{
   data: Record<string, any>
   onUpdate: (key: string, value: any) => void
 }>()
+
+const { activeEnvironment, activeEnvVariables, router } = useActiveEntities()
 </script>
 <template>
   <ViewLayoutSection>
@@ -28,8 +31,11 @@ defineProps<{
           :key="index"
           :class="{ 'border-t': index === 0 }">
           <DataTableInput
+            :envVariables="activeEnvVariables"
+            :environment="activeEnvironment"
             :modelValue="String(data[option.key] ?? '')"
             :placeholder="option.placeholder"
+            :router="router"
             @update:modelValue="onUpdate(option.key, $event)">
             {{ option.label }}
           </DataTableInput>

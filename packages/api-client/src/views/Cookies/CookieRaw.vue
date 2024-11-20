@@ -4,7 +4,8 @@ import ViewLayoutSection from '@/components/ViewLayout/ViewLayoutSection.vue'
 import { useWorkspace } from '@/store'
 import { useActiveEntities } from '@/store/active-entities'
 
-const { activeCookieId } = useActiveEntities()
+const { activeCookieId, activeEnvVariables, activeEnvironment, router } =
+  useActiveEntities()
 const { cookies } = useWorkspace()
 </script>
 <template>
@@ -15,8 +16,11 @@ const { cookies } = useWorkspace()
     <template v-if="activeCookieId && cookies[activeCookieId]">
       <CodeInput
         class="pl-px pr-2 md:px-2 py-2.5"
+        :envVariables="activeEnvVariables"
+        :environment="activeEnvironment"
         lineNumbers
-        modelValue="" />
+        modelValue=""
+        :router="router" />
     </template>
   </ViewLayoutSection>
 </template>

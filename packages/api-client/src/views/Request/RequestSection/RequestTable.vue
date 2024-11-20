@@ -4,6 +4,7 @@ import DataTable from '@/components/DataTable/DataTable.vue'
 import DataTableCell from '@/components/DataTable/DataTableCell.vue'
 import DataTableCheckbox from '@/components/DataTable/DataTableCheckbox.vue'
 import DataTableRow from '@/components/DataTable/DataTableRow.vue'
+import { useActiveEntities } from '@/store/active-entities'
 import { ScalarButton, ScalarIcon } from '@scalar/components'
 import type { RequestExampleParameter } from '@scalar/oas-utils/entities/spec'
 import { computed } from 'vue'
@@ -30,6 +31,8 @@ const emit = defineEmits<{
   (e: 'uploadFile', idx: number): void
   (e: 'removeFile', idx: number): void
 }>()
+
+const { activeEnvVariables, activeEnvironment, router } = useActiveEntities()
 
 const columns = props.isEnabledHidden ? ['', ''] : ['', '', '36px']
 
@@ -90,9 +93,12 @@ const flattenValue = (item: RequestExampleParameter) => {
           disableCloseBrackets
           disableEnter
           disableTabIndent
+          :envVariables="activeEnvVariables"
+          :environment="activeEnvironment"
           :modelValue="item.key"
           placeholder="Key"
           :required="item.required"
+          :router="router"
           @blur="emit('inputBlur')"
           @focus="emit('inputFocus')"
           @input="items && idx === items.length - 1 && emit('addRow')"
@@ -111,11 +117,14 @@ const flattenValue = (item: RequestExampleParameter) => {
           disableEnter
           disableTabIndent
           :enum="item.enum"
+          :envVariables="activeEnvVariables"
+          :environment="activeEnvironment"
           :max="item.maximum"
           :min="item.minimum"
           :modelValue="item.value"
           :nullable="item.nullable"
           placeholder="Value"
+          :router="router"
           :type="item.type"
           @blur="emit('inputBlur')"
           @focus="emit('inputFocus')"

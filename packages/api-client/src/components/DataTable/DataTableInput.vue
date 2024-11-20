@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import CodeInput from '@/components/CodeInput/CodeInput.vue'
+import type { EnvVariables } from '@/libs/env-helpers'
 import { ScalarIconButton } from '@scalar/components'
+import type { Environment } from '@scalar/oas-utils/entities/environment'
 import { computed, ref } from 'vue'
+import type { Router } from 'vue-router'
 
 import DataTableCell from './DataTableCell.vue'
 import DataTableInputSelect from './DataTableInputSelect.vue'
@@ -12,6 +15,8 @@ const props = withDefaults(
     type?: string
     /** Class for the wrapping cell because attrs is bound to the input */
     containerClass?: string
+    environment: Environment
+    envVariables: EnvVariables
     required?: boolean
     modelValue: string | number
     /** Allows adding a custom value to the enum dropdown, defaults to true */
@@ -20,6 +25,7 @@ const props = withDefaults(
     enum?: string[]
     min?: number
     max?: number
+    router?: Router
   }>(),
   { canAddCustomEnumValue: true, required: false, readOnly: false },
 )
@@ -34,7 +40,6 @@ const emit = defineEmits<{
 defineOptions({ inheritAttrs: false })
 
 const mask = ref(true)
-const query = ref('')
 const interactingWithDropdown = ref(false)
 
 const handleBlur = () => {
@@ -105,11 +110,14 @@ const handleDropdownMouseUp = () => {
           class="border-none text-c-1 disabled:text-c-2 min-w-0 w-full peer"
           disableCloseBrackets
           disableTabIndent
+          :envVariables="envVariables"
+          :environment="environment"
           :max="max"
           :min="min"
           :modelValue="modelValue ?? ''"
           :readOnly="readOnly"
           :required="required"
+          :router="router"
           spellcheck="false"
           :type="inputType"
           @blur="handleBlur"

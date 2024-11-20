@@ -19,7 +19,14 @@ defineEmits<{
   (e: 'importCurl', value: string): void
 }>()
 
-const { activeRequest, activeExample, activeServer } = useActiveEntities()
+const {
+  activeRequest,
+  activeExample,
+  activeEnvVariables,
+  activeEnvironment,
+  activeServer,
+  router,
+} = useActiveEntities()
 const { isReadOnly, requestMutators, requestHistory, events } = useWorkspace()
 
 const selectedRequest = ref(requestHistory[0])
@@ -177,9 +184,12 @@ onBeforeUnmount(() => events.hotKeys.off(handleHotKey))
               disableEnter
               disableTabIndent
               :emitOnBlur="false"
+              :envVariables="activeEnvVariables"
+              :environment="activeEnvironment"
               importCurl
               :modelValue="activeRequest.path"
               :placeholder="activeServer ? '' : 'Enter a URL or cURL command'"
+              :router="router"
               server
               @curl="$emit('importCurl', $event)"
               @submit="handleExecuteRequest"

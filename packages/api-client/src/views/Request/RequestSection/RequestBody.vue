@@ -20,7 +20,13 @@ defineProps<{
   title: string
 }>()
 
-const { activeRequest, activeExample } = useActiveEntities()
+const {
+  activeRequest,
+  activeExample,
+  activeEnvVariables,
+  activeEnvironment,
+  router,
+} = useActiveEntities()
 const { requestExampleMutators } = useWorkspace()
 
 /** use-codemirror package to be udpated accordingly */
@@ -494,10 +500,13 @@ watch(
           <!-- TODO: remove this as type hack when we add syntax highligting -->
           <CodeInput
             content=""
+            :envVariables="activeEnvVariables"
+            :environment="activeEnvironment"
             :language="codeInputLanguage as CodeMirrorLanguage"
             lineNumbers
             lint
             :modelValue="activeExample?.body?.raw?.value ?? ''"
+            :router="router"
             @update:modelValue="updateRequestBody" />
         </template>
       </DataTableRow>
