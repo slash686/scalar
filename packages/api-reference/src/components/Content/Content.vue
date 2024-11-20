@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useWorkspace } from '@scalar/api-client/store'
+import { useActiveEntities } from '@scalar/api-client/store'
 import { RequestAuth } from '@scalar/api-client/views/Request/RequestSection/RequestAuth'
 import type { Server, Spec } from '@scalar/types/legacy'
 import { computed } from 'vue'
@@ -27,9 +27,7 @@ const props = withDefaults(
 )
 
 const { hideModels } = useSidebar()
-const { collections } = useWorkspace()
-
-const activeCollection = computed(() => Object.values(collections)[0])
+const { activeCollection } = useActiveEntities()
 
 const introCardsSlot = computed(() =>
   props.layout === 'classic' ? 'after' : 'aside',
@@ -66,13 +64,13 @@ const introCardsSlot = computed(() =>
             :defaultServerUrl="baseServerURL"
             :servers="props.servers"
             :specification="parsedSpec" />
-          <RequestAuth
-            v-if="activeCollection"
-            :collection="activeCollection"
-            :selectedSecuritySchemeUids="
-              activeCollection.selectedSecuritySchemeUids
-            "
-            title="Authentication" />
+          <div class="scalar-client">
+            <RequestAuth
+              :selectedSecuritySchemeUids="
+                activeCollection?.selectedSecuritySchemeUids ?? []
+              "
+              title="Authentication" />
+          </div>
           <ClientLibraries class="introduction-card-item" />
         </div>
       </template>
