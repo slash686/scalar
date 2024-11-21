@@ -90,7 +90,7 @@ $ pnpm dev:void-server
   }
 })
 
-describe('createRequestOperation', () => {
+describe('sendRequest', () => {
   it('shows a warning when scalar_url is missing', async () => {
     const [error, requestOperation] = createRequestOperation(
       createRequestPayload({
@@ -102,12 +102,18 @@ describe('createRequestOperation', () => {
     const [requestError, result] = await requestOperation.sendRequest()
 
     expect(requestError).toBe(null)
-    expect(result?.response.data).toContain(
+    expect(result?.response.data as string).toContain(
       'The `scalar_url` query parameter is required.',
     )
   })
 
   it('builds a request with a relative server url', async () => {
+    // Mock the origin to make the relative request work
+    vi.spyOn(window, 'location', 'get').mockReturnValue({
+      ...window.location,
+      origin: VOID_URL,
+    })
+
     const [error, requestOperation] = createRequestOperation(
       createRequestPayload({
         serverPayload: { url: `/api` },
@@ -135,11 +141,6 @@ describe('createRequestOperation', () => {
     )
     if (error) throw error
 
-    // Mock the origin to make the relative request work
-    vi.spyOn(window, 'location', 'get').mockReturnValue({
-      ...window.location,
-      origin: VOID_URL,
-    })
     const [requestError, result] = await requestOperation.sendRequest()
 
     expect(requestError).toBe(null)
@@ -199,7 +200,9 @@ describe('createRequestOperation', () => {
     const [requestError, result] = await requestOperation.sendRequest()
 
     expect(requestError).toBe(null)
-    expect(result?.response.data).not.toContain('ECONNREFUSED')
+    expect(JSON.parse(result?.response.data as string)).not.toContain(
+      'ECONNREFUSED',
+    )
     expect(requestError).toBe(null)
     expect(JSON.parse(result?.response.data as string)).toMatchObject({
       method: 'GET',
@@ -285,37 +288,8 @@ describe('createRequestOperation', () => {
     const [requestError, result] = await requestOperation.sendRequest()
 
     expect(requestError).toBe(null)
-    expect(JSON.parse(result?.response.data as string)).toMatchObject({
-      query: {
-        foo: 'bar',
-      },
-    })
-  })
-
-  // TODO: We can’t access the fetch configuration as of now. We could return them, though.
-  it.skip('uses uppercase request method', async () => {
-    const [error, requestOperation] = createRequestOperation(
-      createRequestPayload({
-        serverPayload: { url: VOID_URL },
-        requestPayload: {
-          // Lowercase method
-          method: 'post',
-        },
-      }),
-    )
-    if (error) throw error
-
-    // @ts-expect-error Not added yet
-    const [requestError, result, fetchOptions] =
-      await requestOperation.sendRequest()
-
-    expect(requestError).toBe(null)
-    expect(JSON.parse(result?.response.data as string)).toMatchObject({
-      method: 'POST',
-    })
-    expect(fetchOptions).toMatchObject({
-      // Uppercase method
-      method: 'POST',
+    expect(JSON.parse(result?.response.data as string).query).toMatchObject({
+      foo: 'bar',
     })
   })
 
@@ -346,8 +320,36 @@ describe('createRequestOperation', () => {
     const [requestError, result] = await requestOperation.sendRequest()
 
     expect(requestError).toBe(null)
-    expect(JSON.parse(result?.response.data as string).query).toMatchObject({
-      foo: ['foo', 'bar'],
+    expect(JSON.parse(result?.response.data as string)).toMatchObject({
+      query: {
+        foo: ['foo', 'bar'],
+      },
+    })
+  })
+
+  it('returns the request object with an uppercase method', async () => {
+    const [error, requestOperation] = createRequestOperation(
+      createRequestPayload({
+        serverPayload: { url: VOID_URL },
+        requestPayload: {
+          // Lowercase method
+          method: 'post',
+        },
+      }),
+    )
+    if (error) throw error
+
+    const [requestError, result] = await requestOperation.sendRequest()
+
+    expect(requestError).toBe(null)
+    expect(JSON.parse(result?.response.data as string)).toMatchObject({
+      method: 'POST',
+    })
+    expect(requestOperation.request).toBeInstanceOf(Request)
+    expect(requestOperation.request).toMatchObject({
+      // Uppercase method
+      method: 'POST',
+      url: 'http://127.0.0.1:5052/',
     })
   })
 
@@ -378,14 +380,16 @@ describe('createRequestOperation', () => {
     const [requestError, result] = await requestOperation.sendRequest()
 
     expect(requestError).toBe(null)
-    expect(JSON.parse(result?.response.data as string).query).toStrictEqual({
-      example: 'parameter',
-      foo: 'bar',
-      orange: 'apple',
+    expect(JSON.parse(result?.response.data as string)).toMatchObject({
+      query: {
+        example: 'parameter',
+        foo: 'bar',
+        orange: 'apple',
+      },
     })
   })
 
-  it('doesn’t have any query parameters', async () => {
+  it('doesnt have any query parameters', async () => {
     const [error, requestOperation] = createRequestOperation(
       createRequestPayload({
         serverPayload: {
@@ -398,7 +402,9 @@ describe('createRequestOperation', () => {
     const [requestError, result] = await requestOperation.sendRequest()
 
     expect(requestError).toBe(null)
-    expect(JSON.parse(result?.response.data as string).query).toStrictEqual({})
+    expect(JSON.parse(result?.response.data as string)).toMatchObject({
+      query: {},
+    })
   })
 
   it('should ignore query parameters with empty values', async () => {
