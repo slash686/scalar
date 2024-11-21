@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { provideUseId } from '@headlessui/vue'
 import {
+  ACTIVE_ENTITIES_SYMBOL,
   WORKSPACE_SYMBOL,
+  createActiveEntitiesStore,
   createWorkspaceStore,
 } from '@scalar/api-client/store'
 import { addScalarClassesToHeadless } from '@scalar/components'
@@ -250,6 +252,10 @@ const workspaceStore = createWorkspaceStore({
   useLocalStorage: false,
 })
 provide(WORKSPACE_SYMBOL, workspaceStore)
+
+// Same for the active entities store
+const activeEntitiesStore = createActiveEntitiesStore(workspaceStore)
+provide(ACTIVE_ENTITIES_SYMBOL, activeEntitiesStore)
 
 provide(
   HIDE_DOWNLOAD_BUTTON_SYMBOL,
