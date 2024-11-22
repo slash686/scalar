@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { Lazy } from '@/components/Content/Lazy'
 import { Operation } from '@/features/Operation'
+import { getRequest } from '@/helpers/get-request'
 import { useNavState, useSidebar } from '@/hooks'
+import { useActiveEntities, useWorkspace } from '@scalar/api-client/store'
 import type { Spec, Tag as tagType } from '@scalar/types/legacy'
 import { computed } from 'vue'
 
@@ -15,6 +17,8 @@ const props = defineProps<{
 
 const { getOperationId, getTagId, hash } = useNavState()
 const { collapsedSidebarItems } = useSidebar()
+const { activeCollection, activeServer } = useActiveEntities()
+const { requests, requestExamples, securitySchemes } = useWorkspace()
 
 const tagLayout = computed<typeof Tag>(() =>
   props.layout === 'classic' ? TagAccordion : Tag,
@@ -41,8 +45,13 @@ const isLazy = props.layout !== 'classic' && !hash.value.startsWith('model')
         :isLazy="operationIndex > 0">
         <Operation
           :id="getOperationId(operation, tag)"
+          :collection="activeCollection"
           :layout="layout"
           :operation="operation"
+          :request="getRequest(requests, operation.path, operation.httpVerb)"
+          :requestExamples="requestExamples"
+          :securitySchemes="securitySchemes"
+          :server="activeServer"
           :tag="tag" />
       </Lazy>
     </Component>
