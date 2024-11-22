@@ -64,7 +64,7 @@ const introCardsSlot = computed(() =>
             :defaultServerUrl="baseServerURL"
             :servers="props.servers"
             :specification="parsedSpec" />
-          <div class="scalar-client">
+          <div class="references-auth scalar-client">
             <RequestAuth
               :selectedSecuritySchemeUids="
                 activeCollection?.selectedSecuritySchemeUids ?? []
@@ -204,5 +204,10 @@ const introCardsSlot = computed(() =>
   top: 0;
   right: 0;
   pointer-events: none;
+}
+.references-auth :deep(.scalar-data-table) {
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
 }
 </style>
