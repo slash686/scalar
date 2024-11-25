@@ -10,5 +10,6 @@ export type OpenApiDocumentConfiguration = Partial<
     | 'authentication'
     | 'defaultHttpClient'
     | 'hiddenClients'
+    | 'theme'
   >
 >
