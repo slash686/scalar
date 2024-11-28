@@ -1471,6 +1471,9 @@ importers:
       '@scalar/build-tooling':
         specifier: workspace:*
         version: link:../build-tooling
+      '@scalar/cli':
+        specifier: workspace:*
+        version: link:../cli
       '@scalar/hono-api-reference':
         specifier: workspace:*
         version: link:../hono-api-reference

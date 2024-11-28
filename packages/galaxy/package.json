@@ -22,9 +22,10 @@
   },
   "scripts": {
     "build": "scalar-build-rollup && vite-node scripts/publish.ts",
-    "dev": "vite-node playground/index.ts",
+    "dev": "scalar serve --watch ./src/specifications/3.1.yaml",
     "lint:check": "eslint .",
     "lint:fix": "eslint .  --fix",
+    "playground": "vite-node playground/index.ts",
     "test": "vitest",
     "test:unit": "vitest",
     "types:build": "tsc -p tsconfig.build.json",
@@ -50,6 +51,7 @@
   "devDependencies": {
     "@hono/node-server": "^1.11.0",
     "@scalar/build-tooling": "workspace:*",
+    "@scalar/cli": "workspace:*",
     "@scalar/hono-api-reference": "workspace:*",
     "@scalar/mock-server": "workspace:*",
     "@scalar/openapi-parser": "workspace:*",
