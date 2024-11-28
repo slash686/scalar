@@ -579,8 +579,6 @@ components:
             - https://cdn.scalar.com/photos/mars.jpg
         creator:
           '$ref': '#/components/schemas/User'
-        neighbor:
-          $ref: '#/components/schemas/Planet'
     PaginatedResource:
       type: object
       properties:
