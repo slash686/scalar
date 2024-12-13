@@ -4,9 +4,13 @@ import { useWorkspace } from '@/store'
 import { useActiveEntities } from '@/store/active-entities'
 import type { Server } from '@scalar/oas-utils/entities/spec'
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
 
-const { activeCollection } = useActiveEntities()
+const props = defineProps<{
+  serverUid: string | string[]
+  collectionId: string | string[]
+}>()
+
+const { activeWorkspaceCollections } = useActiveEntities()
 const { servers, serverMutators } = useWorkspace()
 
 const options = [
@@ -18,26 +22,26 @@ const options = [
   },
 ]
 
-const route = useRoute()
-
-const activeServer = computed(
-  () =>
-    servers[
-      activeCollection.value && route.params.server === 'default'
-        ? activeCollection.value?.servers[0]
-        : (activeCollection.value?.servers.find(
-            (uid) => uid === route.params.server,
-          ) ?? '')
-    ],
-)
+const activeServer = computed(() => {
+  const collection = activeWorkspaceCollections.value.find(
+    (col) => col.uid === props.collectionId,
+  )
+  return servers[
+    collection &&
+    typeof props.serverUid === 'string' &&
+    props.serverUid === 'default'
+      ? collection.servers[0]
+      : (collection?.servers.find((uid) => uid === props.serverUid) ?? '')
+  ]
+})
 
 const updateServer = (key: string, value: string) => {
-  if (!activeCollection.value) return
+  if (!activeWorkspaceCollections.value) return
   serverMutators.edit(activeServer.value.uid, key as keyof Server, value)
 }
 
 const updateVariable = (key: string, value: any) => {
-  if (!activeCollection.value) return
+  if (!activeWorkspaceCollections.value) return
   serverMutators.edit(activeServer.value.uid, `variables.${key}.value`, value)
 }
 
@@ -63,7 +67,7 @@ const variablesData = computed(() =>
 )
 </script>
 <template>
-  <div class="w-full">
+  <div class="divide-0.5 divide-x flex w-full">
     <template v-if="activeServer">
       <Form
         :data="activeServer"
