@@ -293,7 +293,9 @@ export const createApiClient = ({
       // Iterate through the requests and adds the variable values to the path parameters
       activeCollection?.value?.requests.forEach((request) => {
         const foundRequest = requests[request]
-        if (!foundRequest) return
+
+        if (!foundRequest?.examples[0]) return
+
         requestExampleMutators.edit(
           foundRequest.examples[0],
           'parameters.path',
@@ -394,7 +396,7 @@ export const createApiClient = ({
         Object.keys(request.requestBody?.content || {})[0] || 'application/json'
       const example =
         request.requestBody?.content?.[contentType]?.examples[exampleKey]
-      if (!example) return
+      if (!example || !request.examples[0]) return
 
       requestExampleMutators.edit(
         request.examples[0],
