@@ -68,7 +68,7 @@ watch(mediaQueries.md, (isMedium) => (showSideBar.value = isMedium))
  *
  * These are centralized here so they can be drilled down AND used in send-request
  */
-const selectedSecuritySchemeUids = computed(
+const selectedSecuritySchemeUids = computed<string[]>(
   () =>
     (isReadOnly
       ? activeCollection.value?.selectedSecuritySchemeUids
@@ -93,15 +93,17 @@ const executeRequest = async () => {
   const environment =
     e.error || typeof e.data !== 'object' ? {} : (e.data ?? {})
 
-  const globalCookies = activeWorkspace.value.cookies.map((c) => cookies[c])
+  const globalCookies = activeWorkspace.value?.cookies
+    .map((c) => cookies[c])
+    .filter((c): c is NonNullable<typeof c> => c !== undefined)
 
   const [error, requestOperation] = createRequestOperation({
     request: activeRequest.value,
     example: activeExample.value,
     selectedSecuritySchemeUids: selectedSecuritySchemeUids.value,
-    proxyUrl: activeWorkspace.value.proxyUrl ?? '',
+    proxyUrl: activeWorkspace.value?.proxyUrl ?? '',
     environment,
-    globalCookies,
+    globalCookies: globalCookies ?? [],
     status: events.requestStatus,
     securitySchemes: securitySchemes,
     server: activeServer.value,
@@ -152,7 +154,7 @@ function createRequestFromCurl({ requestName }: { requestName: string }) {
     } else {
       selectedServerUid.value = serverMutators.add(
         { url: parsedCurl.value.servers[0] },
-        activeWorkspace.value.collections[0],
+        activeWorkspace.value?.collections[0] ?? '',
       ).uid
     }
   }
@@ -166,12 +168,13 @@ function createRequestFromCurl({ requestName }: { requestName: string }) {
       selectedServerUid: selectedServerUid.value,
       requestBody: parsedCurl?.value?.requestBody,
     },
-    activeWorkspace.value.collections[0],
+    activeWorkspace.value?.collections[0] ?? '',
   )
 
   if (newRequest) {
+    // TODO: Use router instead
     router.push(
-      `/workspace/${activeWorkspace.value.uid}/request/${newRequest.uid}`,
+      `/workspace/${activeWorkspace.value?.uid}/request/${newRequest.uid}`,
     )
   }
   modalState.hide()
