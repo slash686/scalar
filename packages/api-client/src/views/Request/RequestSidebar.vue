@@ -192,9 +192,6 @@ const handleClearDrafts = () => {
 const isSearchVisible = ref(false)
 
 const toggleSearch = () => {
-  // Simply toggle the visibility
-  isSearchVisible.value = !isSearchVisible.value
-
   // If we're hiding the search, clear the text
   if (!isSearchVisible.value) {
     searchText.value = ''
@@ -206,6 +203,9 @@ const toggleSearch = () => {
       searchInputRef.value?.focus()
     })
   }
+
+  // Simply toggle the visibility
+  isSearchVisible.value = !isSearchVisible.value
 }
 </script>
 <template>
