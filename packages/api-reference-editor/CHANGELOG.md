@@ -1,5 +1,15 @@
 # @scalar/api-reference-editor
 
+## 0.1.151
+
+### Patch Changes
+
+- Updated dependencies [ec44fe1]
+- Updated dependencies [ec44fe1]
+  - @scalar/use-codemirror@0.11.54
+  - @scalar/api-client@2.2.21
+  - @scalar/api-reference@1.25.92
+
 ## 0.1.150
 
 ### Patch Changes
